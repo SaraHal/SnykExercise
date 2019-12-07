@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        * {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        input {
+            width: 100%;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        label {
+            color: cadetblue;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-evenly;
+            width: 70%;
+        }
+
+        .controls>* {
+            flex-grow: 1;
+            margin: 5px;
+        }
+
+        button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: cadetblue;
+            font-size: 15px;
+        }
+
+        button:hover {
+            color: white;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="controls">
+        <div>
+            <label> Package:</label>
+            <input id="iptPackage" value="express" />
+        </div>
+        <div>
+            <label> Version:</label>
+            <input id="iptVersion" value="4.17.1" />
+        </div>
+        <button id="btnGetDependency">Get Dependency </button>
+    </div>
+
+
+    <div id="dvOutput">
+
+    </div>
+
+    <script>
+        function getDeps(package, version) {
+            return fetch(`/${package}/${version}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw Error(response.status);
+                    }
+                    return response;
+                })
+                .then((response) => response.json());
+        }
+
+        const mapDepsTreeToDom = (deps) => {
+            if (!deps) {
+                return;
+            }
+            const ul = document.createElement('ul');
+
+            Object.keys(deps.dependencies).map(dep => {
+                const li = document.createElement('li');
+                const span = document.createElement('span');
+                span.innerHTML = `${dep}@${deps.dependencies[dep].version}`;
+                li.appendChild(span);
+                li.appendChild(mapDepsTreeToDom(deps.dependencies[dep]));
+                ul.appendChild(li);
+            })
+            return ul;
+        }
+
+        const inptPackage = document.getElementById('iptPackage');
+        const inptVersion = document.getElementById('iptVersion');
+        const dvOutput = document.getElementById('dvOutput');
+
+        document.getElementById('btnGetDependency').addEventListener('click', () => {
+            const package = inptPackage.value;
+            const version = inptVersion.value;
+
+            getDeps(package, version).then(res => {
+                dvOutput.innerHTML = '';
+                dvOutput.appendChild(mapDepsTreeToDom(res));
+            })
+            .catch(ex=>{
+                dvOutput.innerHTML = ex;
+              
+            });
+
+        })
+
+    </script>
+</body>
+
+</html>
