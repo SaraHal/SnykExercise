@@ -10,7 +10,7 @@
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "nodemon": "^1.17.5",
     "semver": "^6.3.0",
     "sqlite3": "^4.1.1"
